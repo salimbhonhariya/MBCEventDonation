@@ -1,0 +1,33 @@
+﻿<h3>CounterStateProvider</h3>
+@using Microsoft.AspNetCore.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+@if (hasLoaded)
+{
+    <CascadingValue Value="@this">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    public int CurrentCount { get; set; }
+    bool hasLoaded;
+
+  
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentCount = await ProtectedSessionStore.GetAsync<int>("count");
+        hasLoaded = true;
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await ProtectedSessionStore.SetAsync("count", CurrentCount);
+    }
+}

@@ -1,0 +1,31 @@
+﻿@page "/TotalExpense"
+<h3>TotalExpense is $: @LastEventExpensesRunningTotal</h3>
+
+@using MBCEventExpense.Repository.EventExpenses
+@inherits OwningComponentBase<EventExpenseService>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Last Running Expenses Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@LastEventExpensesRunningTotal</td>
+        </tr>
+    </tbody>
+</table>
+
+@code {
+    public int LastEventExpensesRunningTotal { get; set; }
+    List<EventExpenseModel> eventExpenses = new List<EventExpenseModel>();
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the forecasts for the current user
+        // We access WeatherForecastService using @Service
+        eventExpenses = await @Service.GetEventExpensesAsync();
+        var LastEventExpenseCount = eventExpenses[eventExpenses.Count - 1];
+        LastEventExpensesRunningTotal = LastEventExpenseCount.RunningTotal;
+    }
+}

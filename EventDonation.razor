@@ -1,0 +1,256 @@
+﻿@page "/EventDonation"
+@using MBCEventDonation.CodeBehindClasses
+@inherits EventDonationBase
+@using Microsoft.AspNetCore.Components.Web
+@using MBCEventDonation.Repository.EventDonation
+@*not a fully qualified path because it is inserted in to _Imports.razor*@
+@*@inject ToastService toastService*@
+@inject IJSRuntime JsRuntime
+
+<h3>Manage Event Donations</h3>
+<br />
+<br />
+<h2>Total donation pledges  as of now is:$@LastEventDonationPledgesRunningTotal</h2>
+<h2>Total collection as of now is:$@LastEventDonationRunningTotal</h2>
+<h2>Total pledge due as of now is:$@LastEventDonationDueRunningTotal</h2>
+<h2>Total pledge due as of now is:$@V</h2>
+
+@if (loadFailed)
+{
+    <h1>Sorry, we could not load this product due to an error.</h1>
+}
+else if (eventDonations == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Money</th>
+                <th>Running Total</th>
+                <th>Pledge Money</th>
+                <th>Pledge Running Total</th>
+                <th>Total Due</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (eventDonations != null)
+            {
+                @foreach (var Eventdonation in eventDonations)
+                {
+                    <tr>
+                        @*https://github.com/stavroskasidis/BlazorContextMenu/blob/develop/README.md*@
+                        @*<ContextMenuTrigger WrapperTag="tr" MenuId="tableContextMenu" Data="Eventdonation">*@
+                        <td>@Eventdonation.Name</td>
+                        <td>$@Eventdonation.Money</td>
+                        <td>$@Eventdonation.RunningTotal</td>
+                        <th>$@Eventdonation.PledgeMoney</th>
+                        <th>$@Eventdonation.PludgesRunningTotal</th>
+                        <th>$@Eventdonation.TotalDue</th>
+                        <td>
+                            <!-- Edit the current EventDonation -->
+                            <button class="btn btn-primary"
+                                    @onclick="(() => EditEventDonation(Eventdonation))">
+                                Edit
+                            </button>
+                        </td>
+                        @*</ContextMenuTrigger>*@
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+<ContextMenu Id="tableContextMenu">
+    @*<Item OnClick="@ReloadClick"> <i class="fas fa-sync-alt blue-icon"></i> Reload</Item>
+        <Item OnClick="@DeleteClick"> <i class="fas fa-trash-alt red-icon"></i> Delete</Item>*@
+</ContextMenu>
+
+<p>
+    <!-- Add a new EventDonation -->
+    <button class="btn btn-primary"
+            @onclick="AddNewEventDonation">
+        Add New EventDonation
+    </button>
+    <br />
+    <br />
+
+    <button class="btn btn-primary"
+            @onclick="DownloadSpreadSheet" disabled="@isExportDisabled">
+        Export to Excel
+    </button>
+    <br />
+    <br />
+
+    @*<button class="btn btn-primary"
+        @onclick="Navigate"> Navigate to EventExpenses component </button>*@
+
+    @if (ShowPopup)
+    {
+        <!-- This is the popup to create or edit a EventDonation -->
+        <div class="modal" tabindex="-1" style="display:block" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Edit EventDonation</h3>
+                        <!-- Button to close the popup -->
+                        <button type="button" class="close"
+                                @onclick="ClosePopup">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <!-- Edit form for the current EventDonation -->
+                    <div class="modal-body">
+                        <label> Name:</label>
+                        <input class="form-control" type="text"
+                               placeholder="Name"
+                               @bind="objeventDonationModel.Name" />
+                        <label> Money:</label>
+                        <input class="form-control" type="text" placeholder="Money"
+                               @bind="objeventDonationModel.Money" />
+                        <label> Pledge Money:</label>
+                        <input class="form-control" type="text"
+                               placeholder="Pledge Money"
+                               @bind="objeventDonationModel.PledgeMoney" />
+                        <!-- Button to save the EventDonation -->
+                        <button class="btn btn-primary" type="submit"
+                                @onclick="SaveEventDonation">
+                            Save
+                        </button>
+                        <!-- Only show delete button if not a new record -->
+                        @if (objeventDonationModel.RowKey != null)
+                        {
+                            //Button to DELETE the EventDonation with java script
+                            @*<button class="btn btn-primary"
+                                        @onclick="@(async () => { await DeleteWithConfirmation(objeventDonationModel.RowKey,objeventDonationModel.PartitionKey ); })">
+                                    Delete
+                                </button>*@
+                            //Button to DELETE the EventDonation  without javascript
+                            <button class="btn btn-primary"
+                                    @onclick="@(async () => { await DeleteWithConfirmationWithoutJavaScript(objeventDonationModel.RowKey, objeventDonationModel.PartitionKey); })">
+                                Delete
+                            </button>
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        @*<EditForm Model="@objeventDonationModel" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+
+            </EditForm>*@
+    }
+
+    @if (ShowDeletePopup)
+    {
+        <div class="modal" tabindex="-1" style="display:block" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Delete EventDonation without java script</h3>
+                        <!-- Button to close the popup -->
+                        <button type="button" class="close"
+                                @onclick="CloseDeletePopup">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <!-- Edit form for the current EventDonation -->
+                    <div class="modal-body">
+                        <!-- Button to delete the EventDonation -->
+                        @if (objeventDonationModel.RowKey != null)
+                        {
+                            <!-- Button to DELETE the EventDonation -->
+                            <button class="btn btn-primary"
+                                    @onclick="@(async () =>
+                            await DeleteEventDonation(objeventDonationModel.RowKey, objeventDonationModel.PartitionKey))">
+                                Ok
+                            </button>
+
+                            <button class="btn btn-primary"
+                                    @onclick="@CloseDeletePopup">
+                                Cancel
+                            </button>
+
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</p>
+
+@code {
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("OnValidSubmit");
+    }
+    // public async Task ReloadClick(ItemClickEventArgs e)
+    //{
+    //    // eventDonations = (await httpClient.GetJsonAsync<WeatherForecast[]>("api/SampleData/WeatherForecasts")).ToList();
+    //    eventDonations = await DonationService.GetEventDonationsAsync();
+
+    // }
+    //public async void DeleteClick(ItemClickEventArgs e)
+    //{
+    //    var currentForecast = e.Data as EventDonationModel;
+    //    await DeleteWithConfirmationFromContextMenu(currentForecast.RowKey, currentForecast.PartitionKey);
+    //    eventDonations.Remove(currentForecast);
+    //    this.StateHasChanged();
+    //    eventDonations = await DonationService.GetEventDonationsAsync();
+    //}
+
+    public async Task DeleteWithConfirmation(string RowKey, string PartitionKey)
+    {
+        //delete
+        bool isConfirmed = await JsRuntime.InvokeAsync<bool>("confirmDelete");
+        if (isConfirmed)
+        {
+            //eventDonations.Remove(eventDonations.Find(m => m.RowKey.Equals(RowKey) && ));
+            // Close the Popup
+            ShowPopup = false;
+
+            // Delete the EventDonation
+            await DeleteEventDonation(RowKey, PartitionKey);
+        }
+    }
+
+    public async Task DeleteWithConfirmationWithoutJavaScript(string RowKey, string PartitionKey)
+    {
+        ShowDeletePopup = true;
+    }
+
+    public async Task DeleteWithConfirmationFromContextMenu(string RowKey, string PartitionKey)
+    {
+        //delete
+        bool isConfirmed = await JsRuntime.InvokeAsync<bool>("confirmDelete");
+        if (isConfirmed)
+        {
+            //eventDonations.Remove(eventDonations.Find(m => m.RowKey.Equals(RowKey) && ));
+            // Close the Popup
+            ShowPopup = false;
+
+            // Delete the EventDonation
+            await DeleteEventDonationFromContextMenu(RowKey, PartitionKey);
+        }
+    }
+
+    protected override  async Task OnAfterRenderAsync(bool firstRender)
+    {
+           // await LoadStateAsync();
+            StateHasChanged();
+        }
+
+}
+
+

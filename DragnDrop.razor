@@ -1,0 +1,224 @@
+﻿
+@page "/DragnDrop"
+@using System.IO;
+@inject IFileReaderService fileReaderService;
+@using System;
+
+@using System.Text;
+<h1>Hello, dropped files!</h1>
+
+Welcome to your new filestreaming app.
+<br />
+This demo reads files that was dropped in without doing anything particular with it.
+<br />
+<br />
+<style>
+    .@dropTargetClass {
+        display:block;
+        padding: 20px;
+        margin-bottom: 10px;
+        border: 1px dashed black;
+        border-radius: 5px;
+    }
+
+    .@dropTargetDragClass {
+        border-color: orangered;
+        font-weight: bold;
+    }
+</style>
+
+<div class="@DropClass"
+     @ref=dropTargetElement
+     @ondrop=OnDrop
+     @ondragenter=OnDragEnter
+     @ondragleave=OnDragLeave>
+    Drop Files here.
+    @foreach (var fileInfo in FileList)
+    {
+        <br />@fileInfo.Name
+    }
+</div>
+<input id="additive" type="checkbox" value=@Additive @onchange="OnAdditiveChange" />
+<label for="additive">Additive</label>
+<br />
+<button @onclick="ReadFile" class="btn btn-primary">Read file</button>
+<button @onclick="ClearFile" class="btn btn-primary">Clear</button>
+<img src="@imageData" />
+<textarea style="max-width: 100%;" cols="50" rows="20">@plainData</textarea>
+<textarea style="max-width: 100%;" cols="50" rows="20">@htmlData</textarea>
+<br />
+<br />
+<textarea style="max-width: 100%;" cols="50" rows="20">@Output</textarea>
+this has to be in wwwroot\pdf folders only folder 
+<iframe src="pdf/BusSchedule.pdf" style="width: 100%;height: 930px;border: none;" frameborder="0" allowfullscreen></iframe>
+@code {
+    ElementReference dropTargetElement;
+    IFileReaderRef dropReference;
+    bool Additive { get; set; }
+
+    const string dropTargetDragClass = "droptarget-drag";
+    const string dropTargetClass = "droptarget";
+
+    private List<string>
+    _dropClasses = new List<string>
+        () { dropTargetClass };
+
+    string DropClass => string.Join(" ", _dropClasses);
+    string Output { get; set; }
+    List<IFileInfo>
+        FileList
+    { get; } = new List<IFileInfo>
+            ();
+
+    protected override async Task OnAfterRenderAsync(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            dropReference = fileReaderService.CreateReference(dropTargetElement);
+            await dropReference.RegisterDropEventsAsync();
+        }
+    }
+
+    public async Task OnAdditiveChange(ChangeEventArgs e)
+    {
+        Additive = (bool)e.Value;
+        await dropReference.UnregisterDropEventsAsync();
+        await dropReference.RegisterDropEventsAsync(Additive);
+    }
+
+    public async Task ClearFile()
+    {
+        await dropReference.ClearValue();
+        await this.RefreshFileList();
+    }
+
+    public void OnDragEnter(EventArgs e)
+    {
+        _dropClasses.Add(dropTargetDragClass);
+    }
+
+    public void OnDragLeave(EventArgs e)
+    {
+        _dropClasses.Remove(dropTargetDragClass);
+    }
+
+    public async Task OnDrop(EventArgs e)
+    {
+        Output += "Dropped a file.";
+        _dropClasses.Remove(dropTargetDragClass);
+        this.StateHasChanged();
+        await this.RefreshFileList();
+    }
+
+    private async Task RefreshFileList()
+    {
+        this.FileList.Clear();
+        foreach (var file in await dropReference.EnumerateFilesAsync())
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+            this.FileList.Add(fileInfo);
+        }
+        this.StateHasChanged();
+    }
+    string imageData = string.Empty;
+    string plainData = string.Empty;
+    string htmlData = string.Empty;
+
+
+    public async Task ReadFile()
+    {
+        Output = string.Empty;
+        string s = string.Empty;
+
+        this.StateHasChanged();
+        var nl = Environment.NewLine;
+        foreach (var file in await dropReference.EnumerateFilesAsync())
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.Name)}: {fileInfo.Name}{nl}";
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.Size)}: {fileInfo.Size}{nl}";
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.Type)}: {fileInfo.Type}{nl}";
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.LastModifiedDate)}: {fileInfo.LastModifiedDate?.ToString() ?? "(N/A)"}{nl}";
+            Output += $"Reading file...";
+            this.StateHasChanged();
+
+            using (MemoryStream mem = await file.CreateMemoryStreamAsync())
+            {
+                imageData = $"data:image/jpg;base64, { Convert.ToBase64String(mem.ToArray())}";
+
+                var result = await file.OpenReadAsync();
+
+                byte[] b = ReadToEnd(mem);
+                plainData = System.Text.Encoding.UTF8.GetString(b);
+
+                htmlData = $"data:text/html, { plainData}";
+                this.StateHasChanged();
+            }
+
+            using (var fs = await file.OpenReadAsync())
+            {
+                var bufferSize = 4096;
+                var buffer = new byte[bufferSize];
+                int count;
+                while ((count = await fs.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                {
+                    Output += $"Read {count} bytes. {fs.Position} / {fs.Length}{nl}";
+                    this.StateHasChanged();
+                }
+                Output += $"Done reading file {fileInfo.Name}{nl}.";
+            }
+            this.StateHasChanged();
+        }
+    }
+
+
+    public static byte[] ReadToEnd(System.IO.Stream stream)
+    {
+        long originalPosition = 0;
+        if (stream.CanSeek)
+        {
+            originalPosition = stream.Position;
+            stream.Position = 0;
+        }
+        try
+        {
+            byte[] readBuffer = new byte[4096];
+            int totalBytesRead = 0;
+            int bytesRead;
+            while ((bytesRead = stream.Read(readBuffer, totalBytesRead, readBuffer.Length - totalBytesRead)) > 0)
+            {
+                totalBytesRead += bytesRead;
+                if (totalBytesRead == readBuffer.Length)
+                {
+                    int nextByte = stream.ReadByte();
+                    if (nextByte != -1)
+                    {
+                        byte[] temp = new byte[readBuffer.Length * 2];
+                        Buffer.BlockCopy(readBuffer, 0, temp, 0, readBuffer.Length);
+                        Buffer.SetByte(temp, totalBytesRead, (byte)nextByte);
+                        readBuffer = temp;
+                        totalBytesRead++;
+                    }
+                }
+            }
+
+            byte[] buffer = readBuffer;
+            if (readBuffer.Length != totalBytesRead)
+            {
+                buffer = new byte[totalBytesRead];
+                Buffer.BlockCopy(readBuffer, 0, buffer, 0, totalBytesRead);
+            }
+            return buffer;
+        }
+        finally
+        {
+            if (stream.CanSeek)
+            {
+                stream.Position = originalPosition;
+            }
+        }
+    }
+}
+
+
+

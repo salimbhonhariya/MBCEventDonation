@@ -1,0 +1,35 @@
+﻿@page "/TotalDonation"
+  
+<h3>TotalDonation is $: @LastEventDonationRunningTotal</h3>
+
+@using MBCEventDonation.Repository.EventDonation
+@inherits OwningComponentBase<EventDonationService>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Last Running Donation Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@LastEventDonationRunningTotal</td>
+        </tr>
+    </tbody>
+</table>
+@code {
+    [Parameter]
+    public int LastEventDonationRunningTotal { get; set; }
+   
+
+    List<EventDonationModel> eventDonations = new List<EventDonationModel>();
+    protected override async Task OnInitializedAsync()
+    {
+
+        // Get the forecasts for the current user
+        // We access WeatherForecastService using @Service
+        eventDonations = await @Service.GetEventDonationsAsync();
+        var LastEventDonationCount = eventDonations[eventDonations.Count - 1];
+        LastEventDonationRunningTotal = LastEventDonationCount.RunningTotal;
+        
+    }
+}

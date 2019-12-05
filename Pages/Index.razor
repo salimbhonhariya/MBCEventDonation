@@ -1,0 +1,343 @@
+﻿@page "/"
+
+<h1>Heading <BSBadge Color="Color.Secondary">Breadcrumbs</BSBadge></h1>
+<BSBreadcrumb>
+
+    <BSBreadcrumbItem IsActive="true">Home</BSBreadcrumbItem>
+
+</BSBreadcrumb>
+
+<BSBreadcrumb>
+
+    <BSBreadcrumbItem><a href="https://blazorstrap.io/breadcrumbs">Home</a></BSBreadcrumbItem>
+
+    <BSBreadcrumbItem IsActive="true">Library</BSBreadcrumbItem>
+
+</BSBreadcrumb>
+
+<BSBreadcrumb>
+
+    <BSBreadcrumbItem><a href="#">Home</a></BSBreadcrumbItem>
+
+    <BSBreadcrumbItem><a href="#">Library</a></BSBreadcrumbItem>
+
+    <BSBreadcrumbItem IsActive="true">Data</BSBreadcrumbItem>
+
+</BSBreadcrumb>
+<h1>Heading <BSBadge Color="Color.Secondary">Alerts</BSBadge></h1>
+
+<BSAlert Color="Color.Primary">
+
+    This is a primary BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Secondary">
+
+    This is a secondary BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Success">
+
+    This is a success BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Danger">
+
+    This is a danger BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Warning">
+
+    This is a warning BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Info">
+
+    This is a info BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Light">
+
+    This is a light BSAlert — check it out!
+
+</BSAlert>
+
+<BSAlert Color="Color.Dark">
+
+    This is a dark BSAlert — check it out!
+
+</BSAlert>
+
+
+<BSAlert Color="Color.Primary">
+
+    This is a primary alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Secondary">
+
+    This is a secondary alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Success">
+
+    This is a success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Danger">
+
+    This is a danger alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Warning">
+
+    This is a warning alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Info">
+
+    This is a info alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Light">
+
+    This is a light alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Dark">
+
+    This is a dark alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+
+</BSAlert>
+
+<BSAlert Color="Color.Success">
+
+    <h4 className="alert-heading">Well done!</h4>
+
+    <p>
+
+        Aww yeah, you successfully read this important alert message. This example text is going
+
+        to run a bit longer so that you can see how spacing within an alert works with this kind
+
+        of content.
+
+    </p>
+
+    <hr />
+
+    <p className="mb-0">
+
+        Whenever you need to, be sure to use margin utilities to keep things nice and tidy.
+
+    </p>
+
+</BSAlert>
+<BSAlert Color="Color.Info" IsDismissible="true" OnDismiss="@OnDismiss">
+
+    I am an alert and I can be dismissed!
+
+</BSAlert>
+
+<h1>Heading <BSBadge Color="Color.Secondary">Badges</BSBadge></h1>
+
+<h1>Heading <BSBadge Color="Color.Secondary">New</BSBadge></h1>
+
+<h2>Heading <BSBadge Color="Color.Secondary">New</BSBadge></h2>
+
+<h3>Heading <BSBadge Color="Color.Secondary">New</BSBadge></h3>
+
+<h3>Heading <BSBadge Color="Color.Secondary">New</BSBadge></h3>
+
+<h5>Heading <BSBadge Color="Color.Secondary">New</BSBadge></h5>
+
+<h6>Heading <BSBadge Color="Color.Secondary">New</BSBadge></h6>
+
+<button type="button" class="btn btn-primary">
+
+    Profile <BSBadge Color="Color.Light">9</BSBadge>
+
+    <span class="sr-only">unread messages</span>
+
+</button>
+
+<h1>Heading <BSBadge Color="Color.Secondary">Badgesr</BSBadge></h1>
+
+<BSBadge Color="Color.Primary">Primary</BSBadge>
+
+<BSBadge Color="Color.Secondary">Secondary</BSBadge>
+
+<BSBadge Color="Color.Success">Success</BSBadge>
+
+<BSBadge Color="Color.Danger">Danger</BSBadge>
+
+<BSBadge Color="Color.Warning">Warning</BSBadge>
+
+<BSBadge Color="Color.Info">Info</BSBadge>
+
+<BSBadge Color="Color.Light">Light</BSBadge>
+
+<BSBadge Color="Color.Dark">Dark</BSBadge>
+
+
+<BSBadge Color="Color.Primary" IsPill="true">Primary</BSBadge>
+
+<BSBadge Color="Color.Secondary" IsPill="true">Secondary</BSBadge>
+
+<BSBadge Color="Color.Success" IsPill="true">Success</BSBadge>
+
+<BSBadge Color="Color.Danger" IsPill="true">Danger</BSBadge>
+
+<BSBadge Color="Color.Warning" IsPill="true">Warning</BSBadge>
+
+<BSBadge Color="Color.Info" IsPill="true">Info</BSBadge>
+
+<BSBadge Color="Color.Light" IsPill="true">Light</BSBadge>
+
+<BSBadge Color="Color.Dark" IsPill="true">Dark</BSBadge>
+
+
+<BSBadge @onclick="Try" Color="Color.Primary">Primary</BSBadge>
+
+<BSBadge Href="#" Color="Color.Secondary">Secondary</BSBadge>
+
+<BSBadge Href="#" Color="Color.Success">Success</BSBadge>
+
+<BSBadge Href="#" Color="Color.Danger">Danger</BSBadge>
+
+<BSBadge Href="#" Color="Color.Warning">Warning</BSBadge>
+
+<BSBadge Href="#" Color="Color.Info">Info</BSBadge>
+
+<BSBadge Href="#" Color="Color.Light">Light</BSBadge>
+
+<BSBadge Href="#" Color="Color.Dark">Dark</BSBadge>
+
+<h1>Heading <BSBadge Color="Color.Secondary">Button toolbar</BSBadge></h1>
+
+
+<BSButton Color="Color.Primary">primary</BSButton>
+
+<BSButton Color="Color.Secondary">secondary</BSButton>
+
+<BSButton Color="Color.Success">success</BSButton>
+
+<BSButton Color="Color.Info">info</BSButton>
+
+<BSButton Color="Color.Warning">warning</BSButton>
+
+<BSButton Color="Color.Danger">danger</BSButton>
+
+<BSButton Color="Color.Light">light</BSButton>
+
+<BSButton Color="Color.Dark">dark</BSButton>
+
+<BSButton Color="Color.Link">link</BSButton>
+
+
+<BSButton OnClick="@onclick">Click Me</BSButton>
+
+
+<BSButton ButtonType="ButtonType.Link" Href="#">Link</BSButton>
+
+<BSButton ButtonType="ButtonType.Button">Button</BSButton>
+
+<BSButton ButtonType="ButtonType.Input" Value="Input" />
+
+<BSButton ButtonType="ButtonType.Submit" Value="Submit" />
+
+<BSButton ButtonType="ButtonType.Reset" Value="Reset" />
+primary secondary success info warning danger light dark
+
+<BSButton IsOutline="true" Color="Color.Primary">primary</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Secondary">secondary</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Success">success</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Info">info</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Warning">warning</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Danger">danger</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Light">light</BSButton>
+
+<BSButton IsOutline="true" Color="Color.Dark">dark</BSButton>
+<BSButton Color="Color.Primary" Size="Size.Large">Large Button</BSButton>
+
+<BSButton Color="Color.Secondary" Size="Size.Large">Large Button</BSButton>
+
+
+<BSButton Color="Color.Primary" Size="Size.Small">Small Button</BSButton>
+
+<BSButton Color="Color.Secondary" Size="Size.Small">Small Button</BSButton>
+<BSButton Color="Color.Primary" Size="Size.Large" IsBlock="true">Block Level Button</BSButton>
+
+<BSButton Color="Color.Secondary" Size="Size.Large" IsBlock="true">Block Level Button</BSButton>
+<BSButton ButtonType="ButtonType.Link" Href="http://blazor.net" Color="Color.Primary" Size="Size.Large" IsActive="true">Primary Link</BSButton>
+
+<BSButton ButtonType="ButtonType.Link" Href="#" Color="Color.Secondary" Size="Size.Large" IsActive="true">Link</BSButton>
+<BSButton Color="Color.Primary" Size="Size.Large" IsDisabled="true">Primary Button</BSButton>
+
+<BSButton Color="Color.Secondary" Size="Size.Large" IsDisabled="true">Button</BSButton>
+
+<BSButton ButtonType="ButtonType.Link" Href="#" Color="Color.Primary" Size="Size.Large" IsDisabled="true">Primary Link</BSButton>
+
+<BSButton ButtonType="ButtonType.Link" Href="#" Color="Color.Secondary" Size="Size.Large" IsDisabled="true">Link</BSButton>
+
+
+<h1>Heading <BSBadge Color="Color.Secondary">Button groups</BSBadge></h1>
+
+<h2>Heading <BSBadge Color="Color.Secondary">Nesting</BSBadge></h2>
+
+
+@*<BSButtonGroup>
+        <BSButton Color="Color.Secondary">1</BSButton>
+        <BSButton Color="Color.Secondary">2</BSButton>
+        <BSDropdown IsGroup="true" IsOpen="@IsOpen">
+            <BSDropdownToggle Color="Color.Secondary" onclick="onclick1" IsOpen="@IsOpen">Dropdown</BSDropdownToggle>
+            <BSDropdownMenu IsOpen="@IsOpen">
+                <BSDropdownItem href="#">Dropdown link</BSDropdownItem>
+                <BSDropdownItem href="#">Dropdown link</BSDropdownItem>
+            </BSDropdownMenu>
+        </BSDropdown>
+    </BSButtonGroup>*@
+
+
+@code {
+    void OnDismiss()
+    {
+        Console.WriteLine("OnDismiss");
+        StateHasChanged();
+    }
+    void Try()
+    {
+        Console.WriteLine("OnDismiss");
+        StateHasChanged();
+    }
+    void onclick(MouseEventArgs e)
+    {
+        Console.WriteLine("Button was clicked!");
+    }
+
+    bool IsOpen { get; set; }
+    void onclick1(MouseEventArgs e)
+    {
+        IsOpen = !IsOpen;
+        StateHasChanged();
+    }
+}

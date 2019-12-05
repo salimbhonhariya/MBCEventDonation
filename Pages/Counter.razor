@@ -1,0 +1,34 @@
+﻿@page "/counter"
+@using Microsoft.AspNetCore.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+<h1>Counter</h1>
+<p>Current count: <strong>@CounterStateProvider.CurrentCount</strong></p>
+
+ <button @onclick="@IncrementCount">Increment</button>
+
+@code {
+    [CascadingParameter] CounterStateProvider CounterStateProvider { get; set; }
+
+    int? currentCount = 0;
+      bool hasLoaded;
+
+    async Task IncrementCount()
+    {
+          CounterStateProvider.CurrentCount++;
+        await CounterStateProvider.SaveChangesAsync();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStateAsync();
+    }
+    //protected override async Task OnAfterRenderAsync()
+    //{
+    //    await LoadStateAsync();
+    //    StateHasChanged();
+    //}
+    async Task LoadStateAsync()
+    {
+        currentCount = await ProtectedSessionStore.GetAsync<int>("count");
+
+    }
+}

@@ -1,0 +1,45 @@
+﻿
+@page "/PRTimes"
+@inherits PRTimesBase
+@using Microsoft.AspNetCore.Components.Web
+@using MBCEventDonation.CodeBehindClasses
+
+<h3>PrayerTimes</h3>
+
+<p>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fajr</th>
+                <th>Dhuhr</th>
+                <th>Asr</th>
+                <th>Maghrib</th>
+                <th>Isha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (rootObjectModel.data != null)
+            {
+                <tr>
+                    <td>@rootObjectModel.data.timings.Fajr</td>
+                    <td>@rootObjectModel.data.timings.Dhuhr</td>
+                    <td>@rootObjectModel.data.timings.Asr</td>
+                    <td>@rootObjectModel.data.timings.Maghrib</td>
+                    <td>@rootObjectModel.data.timings.Isha</td>
+                </tr>
+                <tr></tr>
+                <tr class="blockquote"> Hijri @rootObjectModel.data.date.hijri.date</tr>
+            }
+        </tbody>
+    </table>
+</p>
+@code {
+
+    RootObject rootObjectModel = new RootObject();
+    protected override async Task OnInitializedAsync()
+    {
+        rootObjectModel = await GetPrayerTimesAsync();
+        StateHasChanged();
+    }
+}

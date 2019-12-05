@@ -1,0 +1,46 @@
+﻿@page "/fetchdata"
+
+@using MBCEventDonation.Data
+@inject WeatherService  WeatherForcastService
+
+<h1>Weather EventDonation</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (weatherForcasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var EventDonation in weatherForcasts)
+            {
+                <tr>
+                    <td>@EventDonation.Date.ToShortDateString()</td>
+                    <td>@EventDonation.TemperatureC</td>
+                    <td>@EventDonation.TemperatureF</td>
+                    <td>@EventDonation.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    WeatherForcast[] weatherForcasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        weatherForcasts = await WeatherForcastService.GetWeatherForcastAsync(DateTime.Now);
+    }
+}

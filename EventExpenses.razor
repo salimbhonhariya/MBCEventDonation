@@ -1,0 +1,277 @@
+﻿
+@page "/EventExpenses"
+@page "/EventExpenses/{LastEventDonationRunningTotal:int}"
+
+<h3>Manage Event Expenses</h3>
+<br />
+<br />
+@using Microsoft.AspNetCore.Components.Web
+@using MBCEventExpense.Repository.EventExpenses
+@using MBCEventDonation.Repository.EventDonation
+@using OfficeOpenXml;
+@using System.IO
+@inject MBCEventDonation.Repository.EventDonation.EventDonationService DonationService
+@inherits OwningComponentBase<EventExpenseService>
+@inject ILogger<EventExpenses> logger
+
+    <h2>Total pledge as of now is:$@LastEventDonationPledgesRunningTotal</h2>
+    <h2>Total collection as of now is:$@LastEventDonationRunningTotal</h2>
+    <h2>Total pledge due as of now is:$@LastEventDonationDueRunningTotal</h2>
+    @if (eventExpenses == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Money</th>
+                    <th>Running Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (eventExpenses != null)
+                {
+                    @foreach (var EventExpense in eventExpenses)
+                    {
+                        <tr>
+                            <td>@EventExpense.Name</td>
+                            <td>$@EventExpense.Money</td>
+                            <td>$@EventExpense.RunningTotal</td>
+                            <td>
+                                <!-- Edit the current EventDonation -->
+                                <button class="btn btn-primary"
+                                        @onclick="(() => EditEventExpense(EventExpense))">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+    }
+    <p>
+        <!-- Add a new EventDonation -->
+        <button class="btn btn-primary"
+                @onclick="AddNewEventExpense">
+            Add New EventExpense
+        </button>
+        <br />
+        <br />
+        <button class="btn btn-primary"
+                @onclick="DownloadSpreadSheet">
+            Export to Excel
+        </button>
+        <br />
+
+        <h2>Money on hand is:$@MoneyOnhand</h2>
+
+        @if (ShowPopup)
+        {
+            <!-- This is the popup to create or edit a EventDonation -->
+            <div class="modal" tabindex="-1" style="display:block" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Edit EventExpense</h3>
+                            <!-- Button to close the popup -->
+                            <button type="button" class="close"
+                                    @onclick="ClosePopup">
+                                <span aria-hidden="true">X</span>
+                            </button>
+                        </div>
+                        <!-- Edit form for the current EventDonation -->
+                        <div class="modal-body">
+                            <input class="form-control" type="text"
+                                   placeholder="Name"
+                                   @bind="objEventExpenseModel.Name" />
+                            <input class="form-control" type="number"
+                                   placeholder="Money"
+                                   @bind="objEventExpenseModel.Money" />
+                            <br />
+                            <!-- Button to save the EventDonation -->
+                            <button class="btn btn-primary" type="submit"
+                                    @onclick="SaveEventExpense">
+                                Save
+                            </button>
+                            <!-- Only show delete button if not a new record -->
+                            @if (objEventExpenseModel.RowKey != string.Empty)
+                            {
+                                <!-- Button to delete the EventDonation -->
+                                <button class="btn btn-primary"
+                                        @onclick="DeleteEventExpense">
+                                    Delete
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    @*<TotalDonation></TotalDonation>*@
+    @*<TotalDonation></TotalDonation>*@
+
+    @code {
+
+        [Parameter]
+        public int LastEventDonationRunningTotal { get; set; }
+
+        [Parameter]
+        public int LastEventDonationPledgesRunningTotal { get; set; }
+
+        [Parameter]
+        public int LastEventDonationDueRunningTotal { get; set; }
+
+        [Parameter]
+        public int MoneyOnhand { get; set; }
+
+        List<EventExpenseModel> eventExpenses = new List<EventExpenseModel>();
+        EventExpenseModel objEventExpenseModel = new EventExpenseModel();
+        bool ShowPopup = false;
+        public void DownloadSpreadSheet()
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Expenses");
+                var tableBody = worksheet.Cells["B2:B2"].LoadFromCollection(from D in eventExpenses
+                                                                            select new { D.Name, D.Money, D.RunningTotal }, true);
+                package.SaveAs(new FileInfo(@"C:\PracticeProjects\MBCEventDonation\EventExpenses.xlsx"));
+            }
+        }
+        async Task DeleteEventExpense()
+        {
+            // Close the Popup
+            ShowPopup = false;
+
+            // Delete the EventDonation
+            var result = await @Service.DeleteEventExpenseAsync(objEventExpenseModel.PartitionKey, objEventExpenseModel.RowKey);
+
+            // Get the EventDonations for the current user
+            eventExpenses = await @Service.GetEventExpensesAsync();
+            CalculateMoneyOnHand();
+        }
+        void EditEventExpense(EventExpenseModel EventExpenseModel)
+        {
+            // Set the selected EventDonation
+            // as the current EventDonation
+            objEventExpenseModel = EventExpenseModel;
+
+            // Open the Popup
+            ShowPopup = true;
+        }
+        void ClosePopup()
+        {
+            // Close the Popup
+            ShowPopup = false;
+        }
+        void AddNewEventExpense()
+        {
+            // Make new EventDonation
+            objEventExpenseModel = new EventExpenseModel();
+            // Set Id to 0 so we know it is a new record
+            //objEventExpenseModel.Id = string.Empty;
+            // Open the Popup
+            ShowPopup = true;
+        }
+        async Task SaveEventExpense()
+        {
+            // Close the Popup
+            ShowPopup = false;
+            // A new EventDonation will have the Id set to 0
+            if (objEventExpenseModel.RowKey == null)
+            {
+                // Create new EventDonation
+                EventExpenseModel objeventExpense = new EventExpenseModel();
+                objeventExpense.PartitionKey = DateTime.UtcNow.Ticks.ToString();
+                objeventExpense.RowKey = DateTime.UtcNow.Ticks.ToString();
+                objeventExpense.Name = objEventExpenseModel.Name;
+                objeventExpense.Money = objEventExpenseModel.Money;
+                // Save the result
+                var result =
+                await @Service.AddEventExpenseAsync(objeventExpense);
+                CalculateMoneyOnHand();
+            }
+            else
+            {
+                // This is an updat
+                // This is an update
+                var result =
+               await @Service.UpdateEventExpenseAsync(objEventExpenseModel);
+            }
+            // Get the EventDonations for the current user
+            eventExpenses = await @Service.GetEventExpensesAsync();
+            CalculateMoneyOnHand();
+        }
+
+
+        protected override async Task OnInitializedAsync()
+        {
+            // Get the forecasts for the current user
+            // We access WeatherForecastService using @Service
+            eventExpenses = await @Service.GetEventExpensesAsync();
+            await TotalPassedDonation();
+            CalculateMoneyOnHand();
+            //https://www.youtube.com/watch?v=oXNslgIXIbQ
+            //logging levels
+            //logger.LogTrace("This is a log trace");
+            //logger.LogDebug("This is a debug trace");
+            logger.LogInformation(LoggingId.EventExpensesId,"logging from EventExpenses page");
+            //logger.LogWarning("This is a warning log");
+            //logger.LogError("This is a error log");
+            //logger.LogCritical("This is a critical log");
+            //logger.LogError("The server went down at {Time}", DateTime.UtcNow);
+           
+        }
+
+        public List<EventDonationModel> eventDonations = new List<EventDonationModel>();
+
+        protected async Task TotalPassedDonation()
+        {
+            eventDonations = await DonationService.GetEventDonationsAsync();
+            var total = 0;
+            var totalpledge = 0;
+            var totaldue = 0;
+            foreach (var item in eventDonations)
+            {
+                total = item.Money + total;
+                totalpledge = totalpledge + item.PledgeMoney;
+                totaldue = totaldue + item.TotalDue;
+
+            }
+            LastEventDonationRunningTotal = total;
+            LastEventDonationPledgesRunningTotal = totalpledge;
+            LastEventDonationDueRunningTotal = totaldue;
+        }
+
+        protected void CalculateMoneyOnHand()
+        {
+            var LastEventExpensesRunningTotal = 0;
+            foreach (var item in eventExpenses)
+            {
+                LastEventExpensesRunningTotal = item.Money + LastEventExpensesRunningTotal;
+            }
+            MoneyOnhand = LastEventDonationRunningTotal - LastEventExpensesRunningTotal;
+
+            this.StateHasChanged();
+        }
+
+        protected override void OnParametersSet()
+        {
+            //the param will be set now
+            var test = LastEventDonationRunningTotal;
+        }
+
+        public class LoggingId
+        {
+            public const int EventExpensesId = 1001;
+        }
+    }
+
+
+

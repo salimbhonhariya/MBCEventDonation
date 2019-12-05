@@ -1,0 +1,109 @@
+﻿@page "/registrationpage"
+@using MBCEventDonation.Repository.Toast;
+@using Blazor.Extensions.Storage;
+@using Microsoft.AspNetCore.Blazor.Services;
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.ProtectedBrowserStorage;
+@using Microsoft.Extensions.Logging;
+@using OfficeOpenXml;
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Threading.Tasks;
+@using MBCEventDonation.Repository.EventDonation;
+@using MBCEventExpense.Repository.EventExpenses
+
+@inject MBCEventDonation.Repository.EventDonation.EventDonationService DonationService
+@inherits OwningComponentBase<EventExpenseService>
+
+<EditForm Model="@starship" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit" Context="EditFormContext">
+    <DataAnnotationsValidator />
+    <DxFormLayout>
+        <DxFormLayoutItem Caption="Identifier:" ColSpanMd="6">
+            <Template>
+                <DxTextBox @bind-Text="@starship.Identifier" />
+            </Template>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Primary Classification:" ColSpanMd="6">
+            <Template>
+                <DxComboBox NullText="Select classification ..."
+                            @bind-SelectedItem="@starship.Classification"
+                            Data="@(new List<string>() { null, "Defense", "Exploration", "Diplomacy" })" />
+            </Template>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Maximum Accommodation:" ColSpanMd="6">
+            <Template>
+                <DxSpinEdit Id="accommodation" @bind-Value="@starship.MaximumAccommodation" />
+            </Template>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Production Date:" ColSpanMd="6">
+            <Template>
+                <DxDateEdit @bind-Date="@starship.ProductionDate" />
+            </Template>
+        </DxFormLayoutItem>
+        <DxListBox Data="@eventDonations" 
+                   TextFieldName="Name"
+                   @bind-SelectedItems="@SelectedItems">
+        </DxListBox>
+
+
+
+        <DxFormLayoutItem ColSpanMd="12">
+            <Template>
+                <ValidationSummary />
+            </Template>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem ColSpanMd="12">
+            <Template>
+                <button type="submit">Submit</button>
+            </Template>
+        </DxFormLayoutItem>
+    </DxFormLayout>
+</EditForm>
+
+@code {
+    public static IEnumerable<EventDonationModel> eventDonations = new List<EventDonationModel>();
+    public EventDonationModel objeventDonationModel = new EventDonationModel();
+
+      IEnumerable<EventDonationModel> selectedItems = eventDonations.Take(1);
+    IEnumerable<EventDonationModel> SelectedItems
+    {
+        get => eventDonations;
+        set { eventDonations = value; InvokeAsync(StateHasChanged); }
+    }
+
+
+  
+    //IEnumerable<EventDonationModel> selectedItems
+    //{
+    //    get => selectedItems;
+    //    set { selectedItems = value; InvokeAsync(StateHasChanged); }
+    //}
+
+
+    protected void Test()
+    {
+        eventDonations = null; //DonationService.GetEventDonationsAsync();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        eventDonations = await DonationService.GetEventDonationsAsync();
+    }
+
+
+    private Starship starship = new Starship();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("OnValidSubmit");
+    }
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine("OnInvalidSubmit");
+    }
+});
+
+
+
+
