@@ -28,7 +28,7 @@ namespace MBCEventExpense.Repository.EventExpenses
         }
         public async Task<List<EventExpenseModel>> GetEventExpensesAsync()
         {
-            var acc = new CloudStorageAccount(new StorageCredentials("blobtransferutility", "Vs6lSzauuCOL3J81QMfwf9v+6ezGkwUUXRg5PoarJUCCEPsvP3wZHSHK0hrAp9FNhgH7KTPqJgeI/VPAu9jUFg=="), true);
+            var acc = new CloudStorageAccount(new StorageCredentials(""secretkey1"", "Vs6lSzauuCOL3J81QMfwf9v+"secretkey"/VPAu9jUFg=="), true);
             var tableClient = acc.CreateCloudTableClient();
             var table = tableClient.GetTableReference("EventExpense");
             await table.CreateIfNotExistsAsync();

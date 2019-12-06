@@ -57,11 +57,11 @@ namespace MBCEventDonation
 
             services.AddScoped<IAzureTableStorage<EventDonationModel>>(factory =>
             {
-                return new AzureTableStorage<EventDonationModel>(new AzureTableSettings(connectionString: "DefaultEndpointsProtocol=https;AccountName=blobtransferutility; AccountKey=Vs6lSzauuCOL3J81QMfwf9v+6ezGkwUUXRg5PoarJUCCEPsvP3wZHSHK0hrAp9FNhgH7KTPqJgeI/VPAu9jUFg==;EndpointSuffix=core.windows.net", tableName: "EventDonation"));
+                return new AzureTableStorage<EventDonationModel>(new AzureTableSettings(connectionString: "DefaultEndpointsProtocol=https;AccountName="secretkey1"; AccountKey=Vs6lSzauuCOL3J81QMfwf9v+"secretkey"/VPAu9jUFg==;EndpointSuffix=core.windows.net", tableName: "EventDonation"));
             });
             services.AddScoped<IAzureTableStorage<EventExpenseModel>>(factory =>
             {
-                return new AzureTableStorage<EventExpenseModel>(new AzureTableSettings(connectionString: "DefaultEndpointsProtocol=https;AccountName=blobtransferutility; AccountKey=Vs6lSzauuCOL3J81QMfwf9v+6ezGkwUUXRg5PoarJUCCEPsvP3wZHSHK0hrAp9FNhgH7KTPqJgeI/VPAu9jUFg==;EndpointSuffix=core.windows.net", tableName: "EventExpense"));
+                return new AzureTableStorage<EventExpenseModel>(new AzureTableSettings(connectionString: "DefaultEndpointsProtocol=https;AccountName="secretkey1"; AccountKey=Vs6lSzauuCOL3J81QMfwf9v+"secretkey"/VPAu9jUFg==;EndpointSuffix=core.windows.net", tableName: "EventExpense"));
             });
             //   services.AddMvc();
            

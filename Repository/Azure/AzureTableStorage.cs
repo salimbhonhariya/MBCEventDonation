@@ -88,11 +88,11 @@ namespace MBCEventDonation.Repository.Azure
         private async Task<CloudTable> GetTableAsync(string Tablename)
         {
             CloudStorageAccount storageAccount = new CloudStorageAccount( new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(
-            "blobtransferutility", "Vs6lSzauuCOL3J81QMfwf9v+6ezGkwUUXRg5PoarJUCCEPsvP3wZHSHK0hrAp9FNhgH7KTPqJgeI/VPAu9jUFg=="), true);
+            ""secretkey1"", "Vs6lSzauuCOL3J81QMfwf9v+"secretkey"/VPAu9jUFg=="), true);
 
             string storageConnectionString = "DefaultEndpointsProtocol=https;"
-                                            + "AccountName=blobtransferutility"
-                                            + ";AccountKey=Vs6lSzauuCOL3J81QMfwf9v+6ezGkwUUXRg5PoarJUCCEPsvP3wZHSHK0hrAp9FNhgH7KTPqJgeI/VPAu9jUFg=="
+                                            + "AccountName="secretkey1""
+                                            + ";AccountKey=Vs6lSzauuCOL3J81QMfwf9v+"secretkey"/VPAu9jUFg=="
                                             + ";EndpointSuffix=core.windows.net";
             CloudStorageAccount account = CloudStorageAccount.Parse(storageConnectionString);
             CloudTableClient cloudTableClient = account.CreateCloudTableClient();
